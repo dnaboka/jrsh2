@@ -3,6 +3,7 @@ package com.jaspersoft.jrsh.service.provider;
 import com.jaspersoft.jasperserver.jaxrs.client.core.JasperserverRestClient;
 import com.jaspersoft.jasperserver.jaxrs.client.core.RestClientConfiguration;
 import com.jaspersoft.jasperserver.jaxrs.client.core.Session;
+import com.jaspersoft.jasperserver.jaxrs.client.core.exceptions.AuthenticationFailedException;
 import com.jaspersoft.jrsh.exception.ConnectionException;
 
 import java.util.Scanner;
@@ -20,6 +21,8 @@ public class SessionProvider {
 
     private Session session;
     
+    private static String currentlyLoggedUser;
+    
     private SessionProvider() {
     }
 
@@ -33,6 +36,14 @@ public class SessionProvider {
             }
         }
         return instance;
+    }
+
+    public Session getSession() {
+        if (session == null) {
+            System.out.println(">>> User not authorized");
+            throw new AuthenticationFailedException();
+        }
+        return session;
     }
 
     public Session getSession(final String url, final String user, final String pwd, final String org)
@@ -51,6 +62,8 @@ public class SessionProvider {
             if (session != null) {
                 session.logout();
                 session = null;
+                System.out.println(">>> User [" + currentlyLoggedUser + "] successfully logged out");
+                currentlyLoggedUser = null;
             }
         } catch (final Exception ex) {
             throw new ConnectionException(ex);
@@ -86,6 +99,9 @@ public class SessionProvider {
         final Session session;
         try {
             session = client.authenticate(userName, pwd);
+            currentlyLoggedUser = userName;
+        } catch (final AuthenticationFailedException afe) {
+            throw afe;
         } catch (final Exception ex) {
             throw new ConnectionException(ex);
         }

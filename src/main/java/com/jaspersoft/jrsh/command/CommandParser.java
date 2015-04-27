@@ -2,6 +2,7 @@ package com.jaspersoft.jrsh.command;
 
 import com.jaspersoft.jrsh.command.dto.LoginDTO;
 import com.jaspersoft.jrsh.exception.ParsingException;
+import com.jaspersoft.jrsh.util.ResultCode;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -20,7 +21,7 @@ public class CommandParser {
 
     private CommandParser() {}
 
-    public static Command parse(final String... args) throws ParsingException {    // TODO think about catching exception inside and throw PE
+    public static Command<ResultCode> parse(final String... args) throws ParsingException {    // TODO think about catching exception inside and throw PE
 
         if (args == null || args.length == 0) {
             throw new ParsingException();
@@ -39,7 +40,7 @@ public class CommandParser {
 
         if (checkLoginToken(args[0])) {
             if (args.length == 1) {
-                final Command command = CommandFactory.getCommand(LoginCommand.NAME);
+                final Command<ResultCode> command = CommandFactory.getCommand(LoginCommand.NAME);
                 fillCommandParams(command, args[0]);
                 return command;
             } else {
@@ -65,7 +66,11 @@ public class CommandParser {
     private static void fillCommandParams(final Command command, final String... args)
             throws ParsingException {
 
-        if (args == null || args.length == 0) {
+        if (!command.hasArguments()) {
+            return;
+        }
+
+        if ((args == null || args.length == 0)) {
             throw new ParsingException("Empty argument line. Please use following format: " + command.getUsageDescription());
         }
 
@@ -107,7 +112,7 @@ public class CommandParser {
     private static String defineGenericTypeClassName(final Command command) {
 
         final Class commandClass = command.getClass();
-        final ParameterizedType genericType = (ParameterizedType) command.getClass().getGenericInterfaces()[0];
+        final ParameterizedType genericType = (ParameterizedType) commandClass.getGenericInterfaces()[0];
         final Class parameter = (Class) genericType.getActualTypeArguments()[0];
         return parameter.getName();
     }

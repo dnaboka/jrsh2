@@ -1,5 +1,7 @@
 package com.jaspersoft.jrsh.command;
 
+import com.jaspersoft.jrsh.util.ResultCode;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +30,7 @@ public class CommandFactory {
         commandMap.put(cmdName.toLowerCase(), cmdClass);
     }
 
-    public static Command getCommand(final String commandName) {
+    public static Command<ResultCode> getCommand(final String commandName) {
 
         if (commandName == null || commandName.isEmpty()) {
             final String errMsg = "Command name is null or empty, please choose correct command name and try again";
@@ -43,7 +45,7 @@ public class CommandFactory {
 
                 if (cmdName.equals(commandName.toLowerCase())) {
                     final Class cmdClass = commandMap.get(cmdName);
-                    return (Command) cmdClass.newInstance();
+                    return (Command<ResultCode>) cmdClass.newInstance();
                 }
             }
         } catch (final InstantiationException ie) {

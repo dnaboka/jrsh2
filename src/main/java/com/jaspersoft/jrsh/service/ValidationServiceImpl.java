@@ -17,6 +17,9 @@ public class ValidationServiceImpl implements ValidationService {
 
         try {
             final Object object = command.getParamDTO();
+            if (object == null) {
+                return;
+            }
             final Field[] fieldsToValidate = object.getClass().getDeclaredFields();
             for (Field field : fieldsToValidate) {
                 if (field.isAnnotationPresent(Mandatory.class)) {

@@ -9,10 +9,14 @@ import java.util.concurrent.Callable;
  * @version 1.0 4/21/15
  */
 public interface Command<T> extends Callable<ResultCode> {
-
+    
     T getParamDTO();
 
     void setParamDTO(final T paramDTO);
 
+    String getName();
+    
     String getUsageDescription();
+
+    boolean hasArguments();
 }

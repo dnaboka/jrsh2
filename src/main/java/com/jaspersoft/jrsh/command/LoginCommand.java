@@ -13,6 +13,8 @@ public class LoginCommand implements Command<LoginDTO> {
 
     public static final String NAME = "login";
 
+    public static final String USAGE_DESCRIPTION = "login url <url> login <login> password <password> [organization <org>]";
+
     private LoginDTO loginDTO;
 
     static {
@@ -20,17 +22,12 @@ public class LoginCommand implements Command<LoginDTO> {
     }
 
     @Override
-    public ResultCode call() throws ExecutionException {
+    public ResultCode call() throws Exception {
 
-        try {
-            SessionProvider.getInstance().invalidateSession();
-            SessionProvider.getInstance().getSession(loginDTO.getUrl(), loginDTO.getLogin(), loginDTO.getPassword(),
-                    loginDTO.getOrganization());
-            this.loginDTO = null;
-            return ResultCode.SUCCESS;
-        } catch (final Exception e) {
-            throw new ExecutionException(e);
-        }
+        SessionProvider.getInstance().invalidateSession();
+        SessionProvider.getInstance().getSession(loginDTO.getUrl(), loginDTO.getLogin(), loginDTO.getPassword(),
+                loginDTO.getOrganization());
+        return ResultCode.SUCCESS;
     }
 
     @Override
@@ -44,7 +41,17 @@ public class LoginCommand implements Command<LoginDTO> {
     }
 
     @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Override
     public String getUsageDescription() {
-        return "login url <url> login <login> password <password> [organization <org>]"; // TODO use const
+        return USAGE_DESCRIPTION;
+    }
+
+    @Override
+    public boolean hasArguments() {
+        return true;
     }
 }
